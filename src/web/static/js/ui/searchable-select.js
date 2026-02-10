@@ -58,6 +58,20 @@ export class SearchableSelect {
         this._bindEvents();
         this._updateFromOriginalSelect();
 
+        // Debug: log if no options found
+        if (this.allOptions.length === 0) {
+            console.warn(`[SearchableSelect] No options found for #${this.originalSelect.id}, retrying...`);
+            // Retry after a short delay (options might not be parsed yet)
+            setTimeout(() => {
+                this._updateFromOriginalSelect();
+                if (this.allOptions.length > 0) {
+                    console.log(`[SearchableSelect] Options loaded for #${this.originalSelect.id}: ${this.allOptions.length} options`);
+                } else {
+                    console.error(`[SearchableSelect] Still no options for #${this.originalSelect.id}`);
+                }
+            }, 100);
+        }
+
         // Hide original select
         this.originalSelect.style.display = 'none';
     }
@@ -327,6 +341,11 @@ export class SearchableSelect {
         this.displayText.textContent = option.label;
         this.displayText.classList.remove('placeholder');
 
+        // Update selected property for all options
+        this.allOptions.forEach(opt => {
+            opt.selected = (opt.value === option.value);
+        });
+
         // Update original select
         this.originalSelect.value = option.value;
         this.originalSelect.dispatchEvent(new Event('change', { bubbles: true }));
@@ -346,6 +365,11 @@ export class SearchableSelect {
         this.currentValue = value;
         this.displayText.textContent = value;
         this.displayText.classList.remove('placeholder');
+
+        // Clear selected flag from all existing options
+        this.allOptions.forEach(opt => {
+            opt.selected = false;
+        });
 
         // Add option to original select if not exists
         let optionEl = this.originalSelect.querySelector(`option[value="${CSS.escape(value)}"]`);
@@ -426,6 +450,12 @@ export class SearchableSelect {
         this.wrapper.classList.add('open');
         this.arrow.textContent = 'expand_less';
 
+        // Debug: log options state
+        if (this.allOptions.length === 0) {
+            console.warn(`[SearchableSelect] Opening dropdown for #${this.originalSelect.id} but allOptions is empty! Retrying...`);
+            this._updateFromOriginalSelect();
+        }
+
         // Reset search and show all options
         this.searchInput.value = '';
         this.clearBtn.style.display = 'none';
@@ -490,12 +520,13 @@ export class SearchableSelect {
         let currentGroup = null;
 
         options.forEach(opt => {
-            if (opt.value === '' && (opt.textContent.includes('Loading') || opt.textContent.includes('Enter'))) {
+            const text = opt.textContent.trim();
+            if (opt.value === '' && (text.includes('Loading') || text.includes('Enter'))) {
                 return; // Skip loading/placeholder
             }
 
             // Check for optgroup
-            if (opt.parentElement.tagName === 'OPTGROUP') {
+            if (opt.parentElement && opt.parentElement.tagName === 'OPTGROUP') {
                 currentGroup = opt.parentElement.label;
             } else {
                 currentGroup = null;
@@ -503,7 +534,7 @@ export class SearchableSelect {
 
             this.allOptions.push({
                 value: opt.value,
-                label: opt.textContent,
+                label: text,
                 description: opt.title || '',
                 group: currentGroup,
                 selected: opt.selected
@@ -528,6 +559,12 @@ export class SearchableSelect {
             this.displayText.textContent = this.options.noSelectionText;
             this.displayText.classList.add('placeholder');
         }
+
+        // Sync 'selected' property with currentValue for all options
+        // This ensures custom renderers show the correct checkmark
+        this.allOptions.forEach(opt => {
+            opt.selected = (opt.value === this.currentValue);
+        });
 
         this.filteredOptions = [...this.allOptions];
         this._updateBadge();
