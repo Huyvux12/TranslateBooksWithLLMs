@@ -57,6 +57,16 @@ class GeminiProvider(LLMProvider):
         self.api_key = api_key
         self.api_endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
+    def _is_thinking_model(self) -> bool:
+        """Check if the current model supports thinking mode (Gemini 2.5+)."""
+        return "2.5" in self.model
+
+    def _get_thinking_config(self) -> dict:
+        """Return thinkingConfig to disable thinking for supported models."""
+        if self._is_thinking_model():
+            return {"thinkingConfig": {"thinkingBudget": 0}}
+        return {}
+
     async def get_available_models(self) -> list[dict]:
         """
         Fetch available Gemini models from API, excluding experimental/vision models.
@@ -138,7 +148,8 @@ class GeminiProvider(LLMProvider):
                 }]
             }],
             "generationConfig": {
-                "temperature": 0.7
+                "temperature": 0.7,
+                **self._get_thinking_config()
             }
         }
 

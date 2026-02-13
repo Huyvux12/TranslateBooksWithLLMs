@@ -110,6 +110,25 @@ class TranslationExtractor:
 
             return extracted
 
+        # FUZZY FALLBACK: Opening tag found but closing tag is malformed
+        # Some models (e.g. Gemini without thinking) write </TRANATION> instead of </TRANSLATION>
+        if starts_correctly:
+            # Extract tag name from closing tag (e.g. "TRANSLATION" from "</TRANSLATION>")
+            closing_tag_match = re.match(r'</(\w+)>', self._tag_out)
+            if closing_tag_match:
+                tag_name = closing_tag_match.group(1)
+                # Look for any closing tag that starts with the same prefix (at least 3 chars)
+                prefix = tag_name[:3]
+                fuzzy_pattern = re.compile(
+                    rf'{re.escape(self._tag_in)}(.*?)</\w*{re.escape(prefix)}\w*>',
+                    re.DOTALL
+                )
+                fuzzy_match = fuzzy_pattern.search(response)
+                if fuzzy_match:
+                    extracted = fuzzy_match.group(1).strip()
+                    print(f"[WARN] Fuzzy tag match: closing tag was malformed, extracted content using prefix '</{prefix}...'")
+                    return extracted
+
         # No tags found at all
         return None
 

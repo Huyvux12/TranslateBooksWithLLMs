@@ -135,7 +135,6 @@ if __name__ == "__main__":
             llm_provider=args.provider,
             checkpoint_manager=checkpoint_manager,
             translation_id=translation_id,
-            progress_callback=None,
             log_callback=log_callback,
             stats_callback=stats_callback,
             check_interruption_callback=None,
