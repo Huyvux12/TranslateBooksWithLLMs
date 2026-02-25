@@ -62,9 +62,9 @@ export const FormManager = {
     /**
      * Initialize form manager
      */
-    initialize() {
+    async initialize() {
         this.setupEventListeners();
-        this.loadDefaultConfig();
+        await this.loadDefaultConfig();  // Fix #108: await server config before continuing
         this.loadCustomInstructions();
     },
 
