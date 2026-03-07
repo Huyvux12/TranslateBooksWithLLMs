@@ -595,16 +595,52 @@ async function showTTSModal(filename, filepath) {
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label style="font-size: 13px;">Target Language</label>
                                 <select id="ttsModalLanguage" class="form-control" style="font-size: 13px;">
-                                    <option value="Chinese">Chinese</option>
+                                    <!-- Most Common -->
+                                    <option value="Chinese">Chinese (中文)</option>
                                     <option value="English">English</option>
-                                    <option value="French">French</option>
-                                    <option value="Spanish">Spanish</option>
-                                    <option value="German">German</option>
-                                    <option value="Italian">Italian</option>
-                                    <option value="Japanese">Japanese</option>
-                                    <option value="Korean">Korean</option>
-                                    <option value="Portuguese">Portuguese</option>
-                                    <option value="Russian">Russian</option>
+                                    <option value="French">French (Français)</option>
+                                    <option value="Spanish">Spanish (Español)</option>
+                                    <option value="German">German (Deutsch)</option>
+                                    <option value="Japanese">Japanese (日本語)</option>
+                                    <option value="Korean">Korean (한국어)</option>
+                                    <option value="Portuguese">Portuguese (Português)</option>
+                                    <option value="Russian">Russian (Русский)</option>
+                                    <option value="Arabic">Arabic (العربية)</option>
+                                    <!-- European -->
+                                    <option value="Italian">Italian (Italiano)</option>
+                                    <option value="Dutch">Dutch (Nederlands)</option>
+                                    <option value="Polish">Polish (Polski)</option>
+                                    <option value="Swedish">Swedish (Svenska)</option>
+                                    <option value="Norwegian">Norwegian (Norsk)</option>
+                                    <option value="Danish">Danish (Dansk)</option>
+                                    <option value="Finnish">Finnish (Suomi)</option>
+                                    <option value="Greek">Greek (Ελληνικά)</option>
+                                    <option value="Czech">Czech (Čeština)</option>
+                                    <option value="Hungarian">Hungarian (Magyar)</option>
+                                    <option value="Romanian">Romanian (Română)</option>
+                                    <option value="Turkish">Turkish (Türkçe)</option>
+                                    <option value="Ukrainian">Ukrainian (Українська)</option>
+                                    <option value="Bulgarian">Bulgarian (Български)</option>
+                                    <option value="Croatian">Croatian (Hrvatski)</option>
+                                    <option value="Slovak">Slovak (Slovenčina)</option>
+                                    <option value="Slovenian">Slovenian (Slovenščina)</option>
+                                    <option value="Lithuanian">Lithuanian (Lietuvių)</option>
+                                    <option value="Latvian">Latvian (Latviešu)</option>
+                                    <option value="Estonian">Estonian (Eesti)</option>
+                                    <!-- Asian -->
+                                    <option value="Hindi">Hindi (हिन्दी)</option>
+                                    <option value="Vietnamese">Vietnamese (Tiếng Việt)</option>
+                                    <option value="Thai">Thai (ไทย)</option>
+                                    <option value="Indonesian">Indonesian (Bahasa Indonesia)</option>
+                                    <option value="Malay">Malay (Bahasa Melayu)</option>
+                                    <option value="Filipino">Filipino (Tagalog)</option>
+                                    <option value="Bengali">Bengali (বাংলা)</option>
+                                    <option value="Tamil">Tamil (தமிழ்)</option>
+                                    <option value="Telugu">Telugu (తెలుగు)</option>
+                                    <!-- Middle Eastern -->
+                                    <option value="Hebrew">Hebrew (עברית)</option>
+                                    <option value="Persian">Persian/Farsi (فارسی)</option>
+                                    <option value="Urdu">Urdu (اردو)</option>
                                 </select>
                             </div>
 
@@ -683,16 +719,33 @@ async function showTTSModal(filename, filepath) {
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label style="font-size: 13px;">Target Language</label>
                                 <select id="ttsModalChatterboxLang" class="form-control" style="font-size: 13px;">
+                                    <!-- Most Common -->
                                     <option value="en">English</option>
-                                    <option value="zh">Chinese</option>
-                                    <option value="es">Spanish</option>
-                                    <option value="fr">French</option>
-                                    <option value="de">German</option>
-                                    <option value="it">Italian</option>
-                                    <option value="ja">Japanese</option>
-                                    <option value="ko">Korean</option>
-                                    <option value="pt">Portuguese</option>
-                                    <option value="ru">Russian</option>
+                                    <option value="zh">Chinese (中文)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="fr">French (Français)</option>
+                                    <option value="de">German (Deutsch)</option>
+                                    <option value="it">Italian (Italiano)</option>
+                                    <option value="ja">Japanese (日本語)</option>
+                                    <option value="ko">Korean (한국어)</option>
+                                    <option value="pt">Portuguese (Português)</option>
+                                    <option value="ru">Russian (Русский)</option>
+                                    <option value="ar">Arabic (العربية)</option>
+                                    <!-- European -->
+                                    <option value="pl">Polish (Polski)</option>
+                                    <option value="tr">Turkish (Türkçe)</option>
+                                    <option value="nl">Dutch (Nederlands)</option>
+                                    <option value="cs">Czech (Čeština)</option>
+                                    <option value="sv">Swedish (Svenska)</option>
+                                    <option value="da">Danish (Dansk)</option>
+                                    <option value="fi">Finnish (Suomi)</option>
+                                    <option value="hu">Hungarian (Magyar)</option>
+                                    <!-- Asian -->
+                                    <option value="hi">Hindi (हिन्दी)</option>
+                                    <option value="vi">Vietnamese (Tiếng Việt)</option>
+                                    <option value="id">Indonesian (Bahasa Indonesia)</option>
+                                    <!-- Other -->
+                                    <option value="el">Greek (Ελληνικά)</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">

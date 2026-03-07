@@ -670,6 +670,7 @@ async def generate_tts_for_translation(
     target_language: str,
     tts_config: 'TTSConfig',
     log_callback: Optional[Callable] = None,
+    progress_callback: Optional[Callable[[int, int, str], None]] = None,
 ) -> Tuple[bool, str, Optional[str]]:
     """
     Generate TTS audio from a translated file.

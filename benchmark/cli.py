@@ -12,7 +12,7 @@ import asyncio
 import sys
 from typing import Optional
 
-from benchmark.config import BenchmarkConfig, DEFAULT_EVALUATOR_MODEL
+from benchmark.config import BenchmarkConfig, DEFAULT_EVALUATOR_MODEL, DEFAULT_EVALUATOR_PROVIDER, DEFAULT_POE_EVALUATOR_MODEL
 from benchmark.runner import BenchmarkRunner, quick_benchmark, full_benchmark
 from benchmark.results.storage import ResultsStorage
 from benchmark.wiki.generator import WikiGenerator
@@ -72,11 +72,14 @@ def cmd_run(args: argparse.Namespace) -> int:
     provider = getattr(args, 'provider', 'ollama') or 'ollama'
 
     # Build configuration
+    evaluator_provider = getattr(args, 'evaluator_provider', DEFAULT_EVALUATOR_PROVIDER)
     config = BenchmarkConfig.from_cli_args(
         openrouter_key=args.openrouter_key,
+        poe_key=args.poe_key,
         evaluator_model=args.evaluator,
         ollama_endpoint=args.ollama_endpoint,
         translation_provider=provider,
+        evaluator_provider=evaluator_provider,
     )
 
     # Validate configuration
@@ -616,9 +619,21 @@ Examples:
              "Can also be set via OPENROUTER_API_KEY env var."
     )
     run_parser.add_argument(
+        "--evaluator-provider",
+        choices=["openrouter", "poe"],
+        default=DEFAULT_EVALUATOR_PROVIDER,
+        help=f"Provider for evaluation (default: {DEFAULT_EVALUATOR_PROVIDER})"
+    )
+    run_parser.add_argument(
         "--evaluator",
-        default=DEFAULT_EVALUATOR_MODEL,
-        help=f"OpenRouter model for evaluation (default: {DEFAULT_EVALUATOR_MODEL})"
+        default=None,
+        help=f"Model for evaluation (default: {DEFAULT_EVALUATOR_MODEL} for OpenRouter, "
+             f"{DEFAULT_POE_EVALUATOR_MODEL} for Poe)"
+    )
+    run_parser.add_argument(
+        "--poe-key",
+        help="Poe API key (for evaluation if using --evaluator-provider poe). "
+             "Can also be set via POE_API_KEY env var."
     )
     run_parser.add_argument(
         "--ollama-endpoint",

@@ -48,6 +48,13 @@ DEFAULT_QUICK_LANGUAGES = [
 # Default evaluator model
 DEFAULT_EVALUATOR_MODEL = "google/gemini-3-flash-preview"
 
+# Default evaluator provider ("openrouter" or "poe")
+DEFAULT_EVALUATOR_PROVIDER = "poe"
+
+# Default POE model for evaluation
+# Available models: gemini-3.1-flash-lite, gemini-3.1-pro, Claude-Sonnet-4, GPT-4o, etc.
+DEFAULT_POE_EVALUATOR_MODEL = "gemini-3.1-flash-lite"
+
 # Score thresholds for visual indicators
 SCORE_THRESHOLDS = {
     "excellent": 9,   # 🟢 9-10
@@ -90,6 +97,18 @@ class OpenRouterConfig:
     # Request headers
     site_url: str = "https://github.com/yourusername/TranslateBookWithLLM"
     site_name: str = "TranslateBookWithLLM Benchmark"
+
+
+@dataclass
+class PoeConfig:
+    """Configuration for Poe evaluation provider."""
+
+    api_key: Optional[str] = field(
+        default_factory=lambda: os.getenv("POE_API_KEY")
+    )
+    endpoint: str = "https://api.poe.com/v1/chat/completions"
+    default_model: str = DEFAULT_POE_EVALUATOR_MODEL
+    timeout: int = 120
 
 
 @dataclass
@@ -137,6 +156,7 @@ class BenchmarkConfig:
 
     ollama: OllamaConfig = field(default_factory=OllamaConfig)
     openrouter: OpenRouterConfig = field(default_factory=OpenRouterConfig)
+    poe: PoeConfig = field(default_factory=PoeConfig)
     paths: PathConfig = field(default_factory=PathConfig)
 
     # Benchmark settings
@@ -145,6 +165,9 @@ class BenchmarkConfig:
 
     # Translation provider ("ollama" or "openrouter")
     translation_provider: str = "ollama"
+
+    # Evaluator provider ("openrouter" or "poe")
+    evaluator_provider: str = DEFAULT_EVALUATOR_PROVIDER
 
     # Retry settings
     max_retries: int = 3
@@ -162,6 +185,8 @@ class BenchmarkConfig:
         evaluator_model: Optional[str] = None,
         ollama_endpoint: Optional[str] = None,
         translation_provider: Optional[str] = None,
+        evaluator_provider: Optional[str] = None,
+        poe_key: Optional[str] = None,
         **kwargs
     ) -> "BenchmarkConfig":
         """Create configuration from CLI arguments with env fallbacks."""
@@ -170,8 +195,12 @@ class BenchmarkConfig:
         if openrouter_key:
             config.openrouter.api_key = openrouter_key
 
+        if poe_key:
+            config.poe.api_key = poe_key
+
         if evaluator_model:
             config.openrouter.default_model = evaluator_model
+            config.poe.default_model = evaluator_model
 
         if ollama_endpoint:
             config.ollama.endpoint = ollama_endpoint
@@ -179,25 +208,42 @@ class BenchmarkConfig:
         if translation_provider:
             config.translation_provider = translation_provider.lower()
 
+        if evaluator_provider:
+            config.evaluator_provider = evaluator_provider.lower()
+
         return config
 
     def validate(self) -> list[str]:
         """Validate configuration and return list of errors."""
         errors = []
 
-        # OpenRouter API key is required for evaluation (always)
-        # and for translation if using OpenRouter provider
-        if not self.openrouter.api_key:
-            if self.translation_provider == "openrouter":
+        # Validate evaluator provider
+        if self.evaluator_provider not in ("openrouter", "poe"):
+            errors.append(
+                f"Invalid evaluator provider: {self.evaluator_provider}. "
+                "Must be 'openrouter' or 'poe'"
+            )
+
+        # Check API key for evaluation provider
+        if self.evaluator_provider == "poe":
+            if not self.poe.api_key:
                 errors.append(
-                    "OpenRouter API key not configured. Required for both translation and evaluation. "
-                    "Set OPENROUTER_API_KEY in .env or use --openrouter-key"
+                    "Poe API key not configured. Required for evaluation. "
+                    "Set POE_API_KEY in .env or use --poe-key"
                 )
-            else:
+        else:  # openrouter
+            if not self.openrouter.api_key:
                 errors.append(
                     "OpenRouter API key not configured. Required for evaluation. "
                     "Set OPENROUTER_API_KEY in .env or use --openrouter-key"
                 )
+
+        # Check translation provider API key if needed
+        if self.translation_provider == "openrouter" and not self.openrouter.api_key:
+            errors.append(
+                "OpenRouter API key not configured. Required for translation. "
+                "Set OPENROUTER_API_KEY in .env or use --openrouter-key"
+            )
 
         if not self.paths.languages_file.exists():
             errors.append(f"Languages file not found: {self.paths.languages_file}")
@@ -207,7 +253,10 @@ class BenchmarkConfig:
 
         # Validate translation provider
         if self.translation_provider not in ("ollama", "openrouter"):
-            errors.append(f"Invalid translation provider: {self.translation_provider}. Must be 'ollama' or 'openrouter'")
+            errors.append(
+                f"Invalid translation provider: {self.translation_provider}. "
+                "Must be 'ollama' or 'openrouter'"
+            )
 
         return errors
 

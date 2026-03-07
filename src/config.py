@@ -127,6 +127,8 @@ CONTROLLABLE_THINKING_MODELS = [
     "qwen3:4b",       # Smaller Qwen3 models likely controllable
     "qwen3:1.7b",     # Smaller Qwen3 models likely controllable
     "qwen3:0.6b",     # Smaller Qwen3 models likely controllable
+    "qwen3.5:9b",     # Qwen3.5 tested
+    "qwen3.5:35b",    # Qwen3.5 large - controllable
 ]
 
 # Legacy alias for backward compatibility

@@ -28,7 +28,7 @@ from benchmark.translator import (
     test_openrouter_translation_connection, get_available_openrouter_models
 )
 from benchmark.evaluator import (
-    TranslationEvaluator, test_openrouter_connection
+    TranslationEvaluator, test_openrouter_connection, test_poe_connection
 )
 
 
@@ -214,12 +214,19 @@ class BenchmarkRunner:
             else:
                 self._log("info", f"Ollama: {ollama_msg}")
 
-        # Test OpenRouter connection (for evaluation - always required)
-        openrouter_ok, openrouter_msg = await test_openrouter_connection(self.config)
-        if not openrouter_ok:
-            errors.append(f"OpenRouter (evaluation): {openrouter_msg}")
+        # Test evaluator provider connection
+        if self.config.evaluator_provider == "poe":
+            poe_ok, poe_msg = await test_poe_connection(self.config)
+            if not poe_ok:
+                errors.append(f"Poe (evaluation): {poe_msg}")
+            else:
+                self._log("info", f"Poe (evaluation): {poe_msg}")
         else:
-            self._log("info", f"OpenRouter (evaluation): {openrouter_msg}")
+            openrouter_ok, openrouter_msg = await test_openrouter_connection(self.config)
+            if not openrouter_ok:
+                errors.append(f"OpenRouter (evaluation): {openrouter_msg}")
+            else:
+                self._log("info", f"OpenRouter (evaluation): {openrouter_msg}")
 
         return len(errors) == 0, errors
 
@@ -298,6 +305,12 @@ class BenchmarkRunner:
         if not models:
             raise ValueError("No models specified")
 
+        # Determine evaluator model based on provider
+        if self.config.evaluator_provider == "poe":
+            evaluator_model = self.config.poe.default_model
+        else:
+            evaluator_model = self.config.openrouter.default_model
+
         # Create or resume run
         if resume_run:
             run = resume_run
@@ -309,7 +322,7 @@ class BenchmarkRunner:
                 started_at=datetime.now().isoformat(),
                 models=models,
                 languages=language_codes,
-                evaluator_model=self.config.openrouter.default_model,
+                evaluator_model=evaluator_model,
             )
             self._log("info", f"Starting new run {run.run_id}")
 
@@ -325,7 +338,11 @@ class BenchmarkRunner:
             self.log_callback,
             provider_type=self.config.translation_provider
         )
-        self._evaluator = TranslationEvaluator(self.config, self.log_callback)
+        self._evaluator = TranslationEvaluator(
+            self.config, 
+            self.log_callback,
+            provider=self.config.evaluator_provider
+        )
 
         try:
             # Generate jobs
