@@ -29,9 +29,6 @@ ARG PORT=5000
 ENV PORT=$PORT
 EXPOSE $PORT
 
-VOLUME /app/translated_files
-VOLUME /app/logs
-VOLUME /app/data
 
 # Healthcheck to verify the server is responding
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
