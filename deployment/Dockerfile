@@ -20,6 +20,7 @@ COPY src/ /app/src/
 COPY prompts/ /app/prompts/
 COPY translation_api.py /app/
 COPY translate.py /app/
+COPY Custom_Instructions/ /app/Custom_Instructions/
 
 # Create necessary directories
 RUN mkdir -p /app/translated_files /app/logs /app/data/uploads
